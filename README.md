@@ -1,104 +1,48 @@
-# SecureZef v2.0 🛡️
+# SecureZef Engine 🛡️ (Go Implementation)
 
-SecureZef is a lightweight, zero-trust security middleware for AI Agents. It acts as an API gateway proxy, intercepting LLM requests and responses, running heuristic analysis, tool firewalls, and alignment checks to prevent prompt injections, data exfiltration, and malicious tool executions.
+SecureZef is an ultra-lightweight, blazing-fast Go wrapper that intercepts output streams of any AI agent (Python, Node, Bash). It scans streams in real-time against strict DLP (Data Loss Prevention) and Prompt Injection policies before the output hits the terminal or the user.
 
-![SecureZef Dashboard (Placeholder)](https://via.placeholder.com/800x400?text=SecureZef+Dashboard+Here)
-
-## ✨ What's New in 2.0
-- **Cleaned and optimized core architecture** (removed legacy planning files)
-- **Advanced Heuristics Engine** with real-time payload sanitization
-- **Strict Tool Firewall** preventing implicit data exfiltration via tool calls
-- **Multi-Model Evaluator** support out-of-the-box (OpenAI, Anthropic, Gemini)
+Forget bloated API proxies. This is 100% Go. It's invisible, highly configurable, and blocks leaks instantly.
 
 ## 🚀 Quick Start
 
-### 1. Installation
-Clone the repository and install dependencies:
+### 1. Build the Engine
 ```bash
-git clone https://github.com/yourusername/secure-zeph.git
-cd secure-zeph
-pip install -r requirements.txt
+go build -o securezef main.go
 ```
 
-### 2. Configuration
-Copy the environment template and adjust it:
+### 2. Run your agent securely
+Wrap your existing AI script (`agent.py` or any other process):
 ```bash
-cp .env.example .env
-# Edit .env to add your OPENAI_API_KEY, ANTHROPIC_API_KEY, etc.
+./securezef -rules rules/master_rules_v1.json -script agent.py
 ```
 
-### 3. Running the Gateway
-Start the SecureZef proxy server:
-```bash
-bash startup.sh
-```
-The gateway runs locally on `http://localhost:8000`.
+## 📜 How Rules Work
 
-## 📜 Core Rules & Policies
+Rules are defined in a simple, highly-configurable JSON file: `rules/master_rules_v1.json`. 
+You don't need to recompile the Go binary to add new rules—just update the JSON and restart the wrapper.
 
-SecureZef enforces the following strict policies via `policies/`:
-1. **No direct credential output**: The agent cannot dump `api_key`, `password`, or `secret`.
-2. **Exfiltration block**: Blocks tool calls attempting to append sensitive data to URLs (`?q=secret`).
-3. **Approval Gates**: Sensitive tools (e.g., `execute_command`, `delete_database`) require explicit human-in-the-loop approval.
-
-![Policy Engine Flow (Placeholder)](https://via.placeholder.com/800x300?text=Policy+Flow+Diagram+Here)
-
-## 🧪 Running Evaluations
-To test the middleware against known prompt injection scenarios (like InjecAgent datasets):
-```bash
-python scripts/run_multi_model.py
+### Example Rule Configuration
+```json
+{
+  "rules": [
+    {
+      "id": "KEY_LEAK_OPENAI",
+      "name": "Blocks OpenAI token leaks",
+      "pattern": "sk-proj-[a-zA-Z0-9_-]+",
+      "severity": "critical"
+    }
+  ]
+}
 ```
 
-## 🤝 Contributing
-Open an issue or submit a PR. Please ensure all tests pass and no secrets are committed.
+### What You Can Block:
+- **API Keys & Secrets:** Match specific token formats.
+- **Destructive Commands:** Intercept dangerous system commands.
+- **Prompt Overrides:** Flag known jailbreak terminology.
 
-## 📄 License
-MIT License
-
-## 🛠️ Configuring Security Policies
-
-SecureZef uses declarative YAML files in the `policies/` directory to configure rules, constraints, and tool firewalls. You don't need to write code to block attacks—just update the config.
-
-### 1. Tool Firewall (`policies/default_tools.yaml`)
-Control exactly which tools the LLM can use, how many times in a row (`max_chain_depth`), and what arguments are forbidden (Regex blocklists).
-
-```yaml
-allowed_tools:
-  - name: "read_file"
-    description: "Read a local file"
-    max_chain_depth: 2
-    arg_constraints:
-      path:
-        type: string
-        blocked_patterns:
-          - ".*\\.env$"      # Blocks reading .env
-          - ".*\\.key$"      # Blocks reading .key files
-          - ".*password.*"
-
-blocked_tools:
-  - name: "execute_shell"
-    reason: "Direct shell execution is forbidden"
-
-default_action: "deny" # Denies any tool not in the allowed list
-```
-
-### 2. Exfiltration Controls (`policies/exfil_controls.yaml`)
-Prevent the agent from leaking data in URLs or bodies. This configuration intercepts outputs before they leave the gateway.
-
-```yaml
-rules:
-  - name: "Block Secret Append to URL"
-    pattern: "https?://[^\\s]+\\?[^\\s]*(?:base64|b64|data|q|query|secret|key|token|api_key|password)\\s*="
-    action: "block"
-    confidence: 0.9
-```
-
-### 3. Approval Gates (`policies/approval_gates.yaml`)
-Some actions shouldn't be blocked entirely but require a Human-in-the-Loop (HITL). Define which actions trigger an approval workflow.
-
-```yaml
-gates:
-  - trigger: "tool_name == 'drop_table'"
-    action: "require_approval"
-    timeout_seconds: 300
-```
+## 🛠 Project Structure
+- `main.go`: The CLI entry point and process wrapper (intercepts IO pipes).
+- `engine/engine.go`: The core regex scanning engine. Compiles rules on startup for zero-latency streaming.
+- `rules/master_rules_v1.json`: The active ruleset repository.
+- `agent.py`: A dummy python script for testing the wrapper.

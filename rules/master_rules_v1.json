@@ -1,0 +1,36 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "description": "Master ruleset for ShieldAgent"
+  },
+  "rules": [
+    {
+      "id": "CMD_INJECTION_BASIC",
+      "category": "command_injection",
+      "pattern": "(?i)(rm\\s+-rf|mkfs|curl\\s+.*\\|\\s*(bash|sh)|wget\\s+.*\\|\\s*(bash|sh))",
+      "severity": "critical",
+      "description": "Blocks destructive commands and remote execution pipelines"
+    },
+    {
+      "id": "KEY_LEAK_OPENAI",
+      "category": "dlp_key_leak",
+      "pattern": "sk-proj-[a-zA-Z0-9_-]+",
+      "severity": "critical",
+      "description": "Blocks OpenAI token leaks"
+    },
+    {
+      "id": "KEY_LEAK_GITHUB",
+      "category": "dlp_key_leak",
+      "pattern": "ghp_[a-zA-Z0-9]{36}",
+      "severity": "critical",
+      "description": "Blocks GitHub Personal Access Token leaks"
+    },
+    {
+      "id": "PROMPT_OVERRIDE",
+      "category": "prompt_injection",
+      "pattern": "(?i)(ignore\\s+previous\\s+instructions|system\\s+override|bypass\\s+rules)",
+      "severity": "high",
+      "description": "Blocks common prompt override attempts"
+    }
+  ]
+}
