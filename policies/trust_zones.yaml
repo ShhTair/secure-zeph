@@ -1,0 +1,46 @@
+# Trust Zone Configuration
+# Defines trust levels and scanning behavior per source zone
+
+version: "1.0"
+
+zones:
+  SYSTEM:
+    description: "System prompts and hardcoded instructions"
+    trust_level: 1.0
+    scan_required: false
+    can_influence_tools: true
+
+  USER:
+    description: "Direct user input"
+    trust_level: 0.7
+    scan_required: true
+    can_influence_tools: true
+
+  RETRIEVED:
+    description: "RAG results, web content, email bodies"
+    trust_level: 0.2
+    scan_required: true
+    can_influence_tools: false
+    taint_on_tool_influence: true
+
+  TOOL_OUTPUT:
+    description: "Results from tool executions"
+    trust_level: 0.3
+    scan_required: true
+    can_influence_tools: false
+    taint_on_tool_influence: true
+
+  MODEL_DRAFT:
+    description: "Model's proposed actions — requires verification"
+    trust_level: 0.5
+    scan_required: true
+    can_influence_tools: false
+
+# Taint propagation rules
+taint_rules:
+  # If RETRIEVED text is found in tool call arguments → tainted
+  retrieved_to_tool: true
+  # If TOOL_OUTPUT text is found in a new tool call → tainted
+  tool_output_to_tool: true
+  # Tainted tool calls require Layer 4+5 regardless of L1 score
+  tainted_force_firewall: true

@@ -1,0 +1,240 @@
+# Multi-model experiment configurations
+# These configs test the same attack scenarios across multiple LLM providers
+# Both with and without the defense pipeline (safety_mode: baseline vs defended)
+#
+# Provider mapping:
+#   azure_openai → Azure AI Foundry (GPT, Claude, DeepSeek, Grok, Kimi)
+#   gemini       → Google Gemini API (Flash, Pro, Flash-Lite)
+#   scan         → Local defense pipeline only (no LLM call)
+
+experiments:
+  # ═══════════════════════════════════════════════════════════════
+  # TIER 1: Quick smoke test (scan-only, no API keys needed)
+  # ═══════════════════════════════════════════════════════════════
+
+  - id: exp_scan_diverse_v1
+    name: "Scan-Only — Diverse Attacks v1"
+    scenarios_path: data/scenarios/diverse_attacks_v1.yaml
+    defense_modes: [defended]
+    models:
+      - provider: scan
+        model: defense_pipeline
+    concurrency: 10
+
+  - id: exp_scan_all_combined
+    name: "Scan-Only — All Scenarios Combined"
+    scenarios_path: data/scenarios/
+    defense_modes: [defended]
+    models:
+      - provider: scan
+        model: defense_pipeline
+    concurrency: 10
+
+  # ═══════════════════════════════════════════════════════════════
+  # TIER 2: Single-model deep test (one model, both modes)
+  # ═══════════════════════════════════════════════════════════════
+
+  - id: exp_gpt41mini_both_modes
+    name: "GPT-4.1 Mini — Baseline vs Defended"
+    scenarios_path: data/scenarios/diverse_attacks_v1.yaml
+    defense_modes: [baseline, defended]
+    models:
+      - provider: azure_openai
+        model: gpt-4.1-mini
+        display_name: "GPT-4.1 Mini"
+    concurrency: 5
+
+  - id: exp_claude_both_modes
+    name: "Claude Sonnet 4.5 — Baseline vs Defended"
+    scenarios_path: data/scenarios/diverse_attacks_v1.yaml
+    defense_modes: [baseline, defended]
+    models:
+      - provider: azure_openai
+        model: claude-sonnet-4-5
+        display_name: "Claude Sonnet 4.5"
+    concurrency: 5
+
+  - id: exp_gemini_both_modes
+    name: "Gemini 2.0 Flash — Baseline vs Defended"
+    scenarios_path: data/scenarios/diverse_attacks_v1.yaml
+    defense_modes: [baseline, defended]
+    models:
+      - provider: gemini
+        model: gemini-2.0-flash
+        display_name: "Gemini 2.0 Flash"
+    concurrency: 5
+
+  - id: exp_deepseek_both_modes
+    name: "DeepSeek-R1 — Baseline vs Defended"
+    scenarios_path: data/scenarios/diverse_attacks_v1.yaml
+    defense_modes: [baseline, defended]
+    models:
+      - provider: azure_openai
+        model: deepseek-r1
+        display_name: "DeepSeek-R1"
+    concurrency: 3
+
+  - id: exp_grok_both_modes
+    name: "Grok-3 Mini — Baseline vs Defended"
+    scenarios_path: data/scenarios/diverse_attacks_v1.yaml
+    defense_modes: [baseline, defended]
+    models:
+      - provider: azure_openai
+        model: grok-3-mini
+        display_name: "Grok-3 Mini"
+    concurrency: 3
+
+  - id: exp_kimi_both_modes
+    name: "Kimi-K2.5 — Baseline vs Defended"
+    scenarios_path: data/scenarios/diverse_attacks_v1.yaml
+    defense_modes: [baseline, defended]
+    models:
+      - provider: azure_openai
+        model: kimi-k2-5
+        display_name: "Kimi-K2.5"
+    concurrency: 3
+
+  # ═══════════════════════════════════════════════════════════════
+  # TIER 3: Multi-model comparison (all providers, both modes)
+  # ═══════════════════════════════════════════════════════════════
+
+  - id: exp_multi_model_diverse
+    name: "Multi-Model — Diverse Attacks (all providers)"
+    scenarios_path: data/scenarios/diverse_attacks_v1.yaml
+    defense_modes: [baseline, defended]
+    models:
+      # --- OpenAI (via Azure) ---
+      - provider: azure_openai
+        model: gpt-4.1-mini
+        display_name: "GPT-4.1 Mini"
+      - provider: azure_openai
+        model: gpt-5.2-chat
+        display_name: "GPT-5.2"
+      - provider: azure_openai
+        model: o3-mini
+        display_name: "o3-mini"
+      # --- Anthropic (via Azure) ---
+      - provider: azure_openai
+        model: claude-sonnet-4-5
+        display_name: "Claude Sonnet 4.5"
+      # --- DeepSeek (via Azure) ---
+      - provider: azure_openai
+        model: deepseek-r1
+        display_name: "DeepSeek-R1"
+      # --- xAI (via Azure) ---
+      - provider: azure_openai
+        model: grok-3-mini
+        display_name: "Grok-3 Mini"
+      # --- MoonshotAI (via Azure) ---
+      - provider: azure_openai
+        model: kimi-k2-5
+        display_name: "Kimi-K2.5"
+      # --- Google Gemini (direct API) ---
+      - provider: gemini
+        model: gemini-2.0-flash
+        display_name: "Gemini 2.0 Flash"
+      - provider: gemini
+        model: gemini-1.5-pro
+        display_name: "Gemini 1.5 Pro"
+    concurrency: 5
+
+  - id: exp_multi_model_full_matrix
+    name: "Full Matrix — All Scenarios × All Models"
+    scenarios_path: data/scenarios/
+    defense_modes: [baseline, defended]
+    models:
+      # --- OpenAI family (via Azure Foundry) ---
+      - provider: azure_openai
+        model: gpt-5.2-chat
+        display_name: "GPT-5.2"
+      - provider: azure_openai
+        model: gpt-4.1-mini
+        display_name: "GPT-4.1 Mini"
+      - provider: azure_openai
+        model: o3-mini
+        display_name: "o3-mini"
+      # --- Anthropic (via Azure Foundry) ---
+      - provider: azure_openai
+        model: claude-sonnet-4-5
+        display_name: "Claude Sonnet 4.5"
+      # --- DeepSeek (via Azure Foundry) ---
+      - provider: azure_openai
+        model: deepseek-r1
+        display_name: "DeepSeek-R1"
+      # --- xAI (via Azure Foundry) ---
+      - provider: azure_openai
+        model: grok-3-mini
+        display_name: "Grok-3 Mini"
+      # --- MoonshotAI (via Azure Foundry) ---
+      - provider: azure_openai
+        model: kimi-k2-5
+        display_name: "Kimi-K2.5"
+      # --- Google Gemini (direct API) ---
+      - provider: gemini
+        model: gemini-2.0-flash
+        display_name: "Gemini 2.0 Flash"
+      - provider: gemini
+        model: gemini-2.0-flash-lite
+        display_name: "Gemini 2.0 Flash-Lite"
+      - provider: gemini
+        model: gemini-1.5-pro
+        display_name: "Gemini 1.5 Pro"
+      - provider: gemini
+        model: gemini-1.5-flash
+        display_name: "Gemini 1.5 Flash"
+    concurrency: 5
+
+  # ═══════════════════════════════════════════════════════════════
+  # TIER 4: Stress test with repeats (variance measurement)
+  # ═══════════════════════════════════════════════════════════════
+
+  - id: exp_variance_test
+    name: "Variance Test — 3 repeats per scenario"
+    scenarios_path: data/scenarios/diverse_attacks_v1.yaml
+    defense_modes: [baseline, defended]
+    repeat_count: 3
+    models:
+      - provider: azure_openai
+        model: gpt-4.1-mini
+        display_name: "GPT-4.1 Mini"
+        temperature: 0.7
+      - provider: azure_openai
+        model: claude-sonnet-4-5
+        display_name: "Claude Sonnet 4.5"
+        temperature: 0.7
+      - provider: gemini
+        model: gemini-2.0-flash
+        display_name: "Gemini 2.0 Flash"
+        temperature: 0.7
+    concurrency: 5
+
+  # ═══════════════════════════════════════════════════════════════
+  # TIER 5: LLM-as-Judge (strong model evaluates weaker ones)
+  # ═══════════════════════════════════════════════════════════════
+
+  - id: exp_llm_judge
+    name: "LLM Judge — GPT-5.2 judges other models"
+    scenarios_path: data/scenarios/diverse_attacks_v1.yaml
+    defense_modes: [baseline]
+    judge_provider: azure_openai
+    judge_model: gpt-5.2-chat
+    models:
+      - provider: azure_openai
+        model: gpt-4.1-mini
+        display_name: "GPT-4.1 Mini"
+      - provider: azure_openai
+        model: claude-sonnet-4-5
+        display_name: "Claude Sonnet 4.5"
+      - provider: azure_openai
+        model: deepseek-r1
+        display_name: "DeepSeek-R1"
+      - provider: azure_openai
+        model: grok-3-mini
+        display_name: "Grok-3 Mini"
+      - provider: azure_openai
+        model: kimi-k2-5
+        display_name: "Kimi-K2.5"
+      - provider: gemini
+        model: gemini-2.0-flash
+        display_name: "Gemini 2.0 Flash"
+    concurrency: 3

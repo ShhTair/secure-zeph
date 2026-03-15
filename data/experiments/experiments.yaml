@@ -1,0 +1,53 @@
+# Experiment configurations for Secure Zeph evaluation runs.
+# Each config defines a scenario set, providers, and defense mode.
+
+experiments:
+  # ── Baseline: no defense, attack miniset ──────────────────────
+  - id: exp_baseline_attacks
+    name: "Baseline — Attack Miniset (no defense)"
+    scenarios_path: data/scenarios/agent_indirect_miniset.yaml
+    providers: [scan]
+    defense_mode: baseline
+    temperature: 0.0
+    max_tokens: 1024
+    concurrency: 10
+
+  # ── Defended: full pipeline, attack miniset ────────────────────
+  - id: exp_defended_attacks
+    name: "Defended — Attack Miniset"
+    scenarios_path: data/scenarios/agent_indirect_miniset.yaml
+    providers: [scan]
+    defense_mode: defended
+    temperature: 0.0
+    max_tokens: 1024
+    concurrency: 10
+
+  # ── Defended: benign miniset (FPR measurement) ────────────────
+  - id: exp_defended_benign
+    name: "Defended — Benign Miniset (FPR check)"
+    scenarios_path: data/scenarios/benign_miniset.yaml
+    providers: [scan]
+    defense_mode: defended
+    temperature: 0.0
+    max_tokens: 1024
+    concurrency: 10
+
+  # ── Defended: InjecAgent DH miniset ────────────────────────────
+  - id: exp_defended_injecagent
+    name: "Defended — InjecAgent DH Miniset"
+    scenarios_path: data/scenarios/injecagent_dh_miniset.yaml
+    providers: [scan]
+    defense_mode: defended
+    temperature: 0.0
+    max_tokens: 1024
+    concurrency: 10
+
+  # ── Full pipeline: all scenarios combined ──────────────────────
+  - id: exp_full_pipeline
+    name: "Full Pipeline — All Scenarios"
+    scenarios_path: data/scenarios/
+    providers: [scan]
+    defense_mode: defended
+    temperature: 0.0
+    max_tokens: 1024
+    concurrency: 5

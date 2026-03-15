@@ -1,0 +1,100 @@
+# ============================================================
+# Secrets & Environment
+# ============================================================
+.env
+.env.local
+.env.*.local
+.env.production
+.env.staging
+*.pem
+*.key
+*.crt
+
+# ============================================================
+# Python
+# ============================================================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+*.egg
+dist/
+build/
+*.whl
+.venv/
+venv/
+env/
+.python-version
+
+# ============================================================
+# Testing & Coverage
+# ============================================================
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+
+# ============================================================
+# DuckDB (binary, regenerable)
+# ============================================================
+*.duckdb
+*.duckdb.wal
+
+# ============================================================
+# Generated results & triage artifacts (reproducible via eval)
+# ============================================================
+data/results/
+triage/fp/
+triage/fn/
+triage/near_miss/
+
+# ============================================================
+# Research repos (large, re-cloneable via scripts/fetch_sources.sh)
+# ============================================================
+research/repos/
+research/papers/
+research/pages/
+
+# ============================================================
+# IDE & Editor
+# ============================================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ============================================================
+# OS
+# ============================================================
+desktop.ini
+ehthumbs.db
+
+# ============================================================
+# Node (in case of future frontend)
+# ============================================================
+node_modules/
+.vercel/
+.next/
+.turbo/
+
+# ============================================================
+# Azure deployment artifacts
+# ============================================================
+.azure/
+*.zip
+infra/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Reports (regeneratable)
+apps/evalrunner/reports/*.md
+apps/evalrunner/reports/*.csv

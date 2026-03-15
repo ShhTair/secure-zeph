@@ -1,0 +1,41 @@
+repositories:
+  - name: InjecAgent
+    url: https://github.com/ShenaoW/InjecAgent
+    focus: agent_indirect_injection_benchmark
+    scenarios_derived: 50
+    rules_derived: [HR-051, HR-052, HR-053, HR-054, HR-055, HR-056, HR-057, HR-058]
+
+  - name: garak
+    url: https://github.com/NVIDIA/garak
+    focus: llm_vulnerability_scanning
+    rules_derived: [HR-031, HR-032, HR-033, HR-034, HR-035, HR-036, HR-037]
+
+  - name: PyRIT
+    url: https://github.com/Azure/PyRIT
+    focus: red_teaming_automation
+    rules_derived: [HR-038, HR-039, HR-040, HR-041, HR-042, HR-043, HR-044, HR-045]
+
+  - name: PromptBench
+    url: https://github.com/microsoft/promptbench
+    focus: adversarial_robustness_evaluation
+    rules_derived: [HR-046, HR-047, HR-048, HR-049, HR-050]
+
+  - name: inspect_ai
+    url: https://github.com/UKGovernmentBEIS/inspect_ai
+    focus: ai_evaluation_platform
+    rules_derived: []
+
+scenarios:
+  attack_minisets:
+    - path: data/scenarios/agent_indirect_miniset.yaml
+      count: 50
+      categories: [override, secret_extraction, role_confusion, instruction_smuggling, exfiltration, encoding_evasion, tool_abuse, persona_jailbreak, latent_injection]
+    - path: data/scenarios/injecagent_dh_miniset.yaml
+      count: 50
+      source: InjecAgent
+      categories: [indirect_injection]
+
+  benign_minisets:
+    - path: data/scenarios/benign_miniset.yaml
+      count: 25
+      categories: [benign, benign_with_context, benign_with_tools, benign_edge]

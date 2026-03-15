@@ -1,0 +1,46 @@
+# Exfiltration Controls
+# Rules for detecting and blocking data exfiltration attempts
+
+version: "1.0"
+
+# Domains that should never appear in tool call arguments or generated URLs
+blocked_domains:
+  - "evil.com"
+  - "attacker.com"
+  - "exfil.site"
+  - "malicious.net"
+  - "ngrok.io"
+  - "webhook.site"
+  - "requestbin.com"
+  - "pipedream.com"
+  - "burpcollaborator.net"
+
+# Patterns in URLs that indicate exfiltration
+suspicious_url_patterns:
+  - pattern: "\\?.*data=.*base64"
+    description: "Base64-encoded data in query parameter"
+    severity: high
+  - pattern: "\\?.*token=.*CANARY"
+    description: "Canary token in URL parameter"
+    severity: critical
+  - pattern: "![^]]*\\]\\(https?://[^)]*\\?[^)]*="
+    description: "Markdown image with query parameters (data exfil)"
+    severity: high
+  - pattern: "data://text"
+    description: "Data URI scheme"
+    severity: medium
+
+# Maximum payload sizes for outgoing data
+max_payload_bytes: 10000
+
+# Canary token patterns that should NEVER appear in outgoing data
+canary_patterns:
+  - "CANARY-zeph-"
+  - "CANARY_TOKEN_"
+  - "SECRET_CANARY_"
+
+# Actions on detection
+on_blocked_domain: "deny"
+on_suspicious_url: "deny"
+on_canary_leak: "deny"
+on_payload_exceeded: "warn"
